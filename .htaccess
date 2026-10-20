@@ -1,0 +1,41 @@
+# ---- Store security & performance (Apache / LiteSpeed) ----
+Options -Indexes
+DirectoryIndex index.php
+
+# Block direct access to private files
+<FilesMatch "^(config\.php|config\.sample\.php|.*\.sql|.*\.md|\.env|\.git.*)$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# Force HTTPS — enable after SSL is active on your domain (remove the # on the 4 lines below)
+# <IfModule mod_rewrite.c>
+#   RewriteEngine On
+#   RewriteCond %{HTTPS} !=on
+#   RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# </IfModule>
+
+# Old page names from the previous version of the site
+<IfModule mod_alias.c>
+  RedirectMatch 301 ^(.*)/home\.php$ $1/
+  RedirectMatch 301 ^(.*)/user_login\.php$ $1/login.php
+  RedirectMatch 301 ^(.*)/user_register\.php$ $1/register.php
+  RedirectMatch 301 ^(.*)/quick_view\.php$ $1/product.php
+  RedirectMatch 301 ^(.*)/search_page\.php$ $1/shop.php
+  RedirectMatch 301 ^(.*)/admin/admin_login\.php$ $1/admin/login.php
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  <FilesMatch "\.(css|js|webp|png|jpe?g|gif|svg|ico)$">
+    Header set Cache-Control "public, max-age=2592000"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
